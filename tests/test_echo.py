@@ -7,7 +7,7 @@ Students are expected to edit this module, to add more tests to run
 against the 'echo.py' program.
 """
 
-__author__ = "???"
+__author__ = "aradcliff"
 
 import sys
 import importlib
@@ -25,6 +25,7 @@ PKG_NAME = 'echo'
 # Students can use this class object in their code
 class Capturing(list):
     """Context Mgr helper for capturing stdout from a function call"""
+
     def __enter__(self):
         self._stdout = sys.stdout
         sys.stdout = self._stringio = StringIO()
@@ -47,7 +48,7 @@ def run_capture(pyfile, args=()):
     p = subprocess.Popen(
         cmd,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
+    )
     stdout, stderr = p.communicate()
     stdout = stdout.decode().splitlines()
     stderr = stderr.decode().splitlines()
@@ -69,8 +70,8 @@ class TestEcho(unittest.TestCase):
         cls.funcs = {
             k: v for k, v in inspect.getmembers(
                 cls.module, inspect.isfunction
-                )
-            }
+            )
+        }
         # check the module for required functions
         assert "main" in cls.funcs, "Missing required function main()"
         assert "create_parser" in cls.funcs, "Missing required function create_parser()"
@@ -104,7 +105,16 @@ class TestEcho(unittest.TestCase):
         self.assertEqual(
             stdout[0], args[0],
             "The program is not performing simple echo"
-            )
+        )
+
+    def test_help(self):
+        """ Check that usage is printed when -h option is given"""
+        args = ["-h"]
+        with open("USAGE") as f:
+            usage = f.read().splitlines()
+        with Capturing() as output:
+            self.module.main(args)
+        self.assertEqual(output, usage)
 
     def test_lower_short(self):
         """Check if short option '-l' performs lowercasing"""
@@ -114,9 +124,45 @@ class TestEcho(unittest.TestCase):
         assert output, "The program did not print anything."
         self.assertEqual(output[0], "hello world")
 
-    #
-    # Students: add more cmd line options tests here.
-    #
+    def test_upper_short(self):
+        """Chack if short option '-u' performs upercasing"""
+        args = ["-u", "hello world"]
+        with Capturing() as output:
+            self.module.main(args)
+        assert output, "The program did not print anything."
+        self.assertEqual(output[0], "HELLO WORLD")
+
+    def test_title_short(self):
+        """Check if short option '-t' performs titlecasing"""
+        args = ["-t", "hello world"]
+        with Capturing() as output:
+            self.module.main(args)
+        assert output, "The program did not print anything."
+        self.assertEqual(output[0], "Hello World")
+
+    def test_all_flags_1(self):
+        """Tests three option flags applied in the order listed"""
+        args = ["-tul", "heLLo!"]
+        with Capturing() as output:
+            self.module.main(args)
+        assert output, "The program did not print anything"
+        self.assertEqual(output[0], "Hello!")
+
+    def test_all_flags_2(self):
+        """Tests two option flags applied in the order listed"""
+        args = ["-ul", "heLLo!"]
+        with Capturing() as output:
+            self.module.main(args)
+        assert output, "The program did not print anything"
+        self.assertEqual(output[0], "hello!")
+
+    def test_no_flags(self):
+        """Test no option flags"""
+        args = ["", "hello world!"]
+        with Capturing() as output:
+            self.module.main(args)
+        assert output, "The program did not print anything"
+        self.assertEqual(output[0], "hello world!")
 
 
 if __name__ == '__main__':
