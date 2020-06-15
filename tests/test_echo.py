@@ -116,6 +116,17 @@ class TestEcho(unittest.TestCase):
             self.module.main(args)
         self.assertEqual(output, usage)
 
+        # Run the command `python ./echo.py -h` in a separate process, then
+        # collect its output.
+        # process = subprocess.Popen(
+        #     ["python", "./echo.py", "-h"],
+        #     stdout=subprocess.PIPE)
+        # stdout, _ = process.communicate()
+        # with open("USAGE") as f:
+        #     usage = f.read()
+
+        # self.assertEqual(stdout, usage)
+
     def test_lower_short(self):
         """Check if short option '-l' performs lowercasing"""
         args = ["-l", "HELLO WORLD"]
@@ -158,11 +169,11 @@ class TestEcho(unittest.TestCase):
 
     def test_no_flags(self):
         """Test no option flags"""
-        args = ["", "hello world!"]
+        args = ["", "hello world"]
         with Capturing() as output:
             self.module.main(args)
         assert output, "The program did not print anything"
-        self.assertEqual(output[0], "hello world!")
+        self.assertEqual(output[0], "hello world")
 
 
 if __name__ == '__main__':
