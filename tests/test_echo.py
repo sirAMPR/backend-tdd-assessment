@@ -145,7 +145,7 @@ class TestEcho(unittest.TestCase):
 
     def test_all_flags_1(self):
         """Tests three option flags applied in the order listed"""
-        args = ["-tul", "heLLo!"]
+        args = ["-ult", "heLLo!"]
         with Capturing() as output:
             self.module.main(args)
         assert output, "The program did not print anything"
