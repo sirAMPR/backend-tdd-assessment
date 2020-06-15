@@ -109,23 +109,15 @@ class TestEcho(unittest.TestCase):
 
     def test_help(self):
         """ Check that usage is printed when -h option is given"""
-        args = ["-h"]
-        with open("USAGE") as f:
-            usage = f.read().splitlines()
-        with Capturing() as output:
-            self.module.main(args)
-        self.assertEqual(output, usage)
-
         # Run the command `python ./echo.py -h` in a separate process, then
         # collect its output.
-        # process = subprocess.Popen(
-        #     ["python", "./echo.py", "-h"],
-        #     stdout=subprocess.PIPE)
-        # stdout, _ = process.communicate()
-        # with open("USAGE") as f:
-        #     usage = f.read()
-
-        # self.assertEqual(stdout, usage)
+        process = subprocess.Popen(
+            ["python", "./echo.py", "-h"],
+            stdout=subprocess.PIPE)
+        stdout, _ = process.communicate()
+        with open("USAGE") as f:
+            usage = f.read()
+        self.assertEqual(stdout.decode('ascii'), usage)
 
     def test_lower_short(self):
         """Check if short option '-l' performs lowercasing"""
@@ -169,7 +161,7 @@ class TestEcho(unittest.TestCase):
 
     def test_no_flags(self):
         """Test no option flags"""
-        args = ["", "hello world"]
+        args = ["hello world"]
         with Capturing() as output:
             self.module.main(args)
         assert output, "The program did not print anything"
